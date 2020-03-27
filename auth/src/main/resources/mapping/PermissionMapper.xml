@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bill99.ayf.auth.persistence.mapper.PermissionMapper">
+    <resultMap id="BaseResultMap" type="com.bill99.ayf.auth.persistence.entity.Permission">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="pid" jdbcType="BIGINT" property="pid"/>
+        <result column="pids" jdbcType="VARCHAR" property="pids"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="path" jdbcType="VARCHAR" property="path"/>
+        <result column="permission" jdbcType="VARCHAR" property="permission"/>
+        <result column="tree_names" jdbcType="VARCHAR" property="treeNames"/>
+        <result column="sys_code" jdbcType="VARCHAR" property="sysCode"/>
+        <result column="sort" jdbcType="INTEGER" property="sort"/>
+        <result column="remarks" jdbcType="VARCHAR" property="remarks"/>
+        <result column="deleted" jdbcType="INTEGER" property="deleted"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="version" jdbcType="INTEGER" property="version"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, `name`, pid, pids, `type`, `path`, permission, tree_names, sys_code, sort, remarks, 
+    deleted, create_time, update_time, version
+  </sql>
+
+    <!-- -->
+    <select id="selectPermissions" resultMap="BaseResultMap"
+            parameterType="com.bill99.ayf.auth.persistence.model.PermissionQuery">
+        SELECT * FROM (
+        SELECT DISTINCT
+        p.id,
+        p.`name`,
+        p.pid,
+        p.type,
+        p.path,
+        p.sort,
+        p.permission
+        FROM
+        `t_ayf_permission` p
+        LEFT JOIN t_ayf_role_permission rp ON p.id = rp.permission_id
+        LEFT JOIN t_ayf_user_role ur ON rp.role_id = ur.role_id
+        WHERE
+        p.deleted = 0
+        <if test="userId != null">
+            AND ur.user_id = #{userId}
+        </if>
+        <if test="sysCode != null">
+            AND p.sys_code = #{sysCode}
+        </if>
+        ) t ORDER BY t.sort
+    </select>
+    
+    <select id="checkUserPermission" resultType="java.lang.Integer">
+        SELECT 
+        COUNT(1)
+        FROM
+        `t_ayf_permission` p
+        LEFT JOIN t_ayf_role_permission rp ON p.id = rp.permission_id
+        LEFT JOIN t_ayf_user_role ur ON rp.role_id = ur.role_id
+        WHERE
+        p.deleted = 0 AND ur.user_id = #{userId} AND p.permission = #{permission}
+    </select>
+    <!-- -->
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_ayf_permission
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from t_ayf_permission
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.bill99.ayf.auth.persistence.entity.Permission">
+    insert into t_ayf_permission (id, `name`, pid, 
+      pids, `type`, `path`, permission, 
+      tree_names, sys_code, sort, 
+      remarks, deleted, create_time, 
+      update_time, version)
+    values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{pid,jdbcType=BIGINT}, 
+      #{pids,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{path,jdbcType=VARCHAR}, #{permission,jdbcType=VARCHAR}, 
+      #{treeNames,jdbcType=VARCHAR}, #{sysCode,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, 
+      #{remarks,jdbcType=VARCHAR}, #{deleted,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{version,jdbcType=INTEGER})
+  </insert>
+    <insert id="insertSelective" parameterType="com.bill99.ayf.auth.persistence.entity.Permission">
+        insert into t_ayf_permission
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                `name`,
+            </if>
+            <if test="pid != null">
+                pid,
+            </if>
+            <if test="pids != null">
+                pids,
+            </if>
+            <if test="type != null">
+                `type`,
+            </if>
+            <if test="path != null">
+                `path`,
+            </if>
+            <if test="permission != null">
+                permission,
+            </if>
+            <if test="treeNames != null">
+                tree_names,
+            </if>
+            <if test="sysCode != null">
+                sys_code,
+            </if>
+            <if test="sort != null">
+                sort,
+            </if>
+            <if test="remarks != null">
+                remarks,
+            </if>
+            <if test="deleted != null">
+                deleted,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="version != null">
+                version,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="pid != null">
+                #{pid,jdbcType=BIGINT},
+            </if>
+            <if test="pids != null">
+                #{pids,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="path != null">
+                #{path,jdbcType=VARCHAR},
+            </if>
+            <if test="permission != null">
+                #{permission,jdbcType=VARCHAR},
+            </if>
+            <if test="treeNames != null">
+                #{treeNames,jdbcType=VARCHAR},
+            </if>
+            <if test="sysCode != null">
+                #{sysCode,jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                #{sort,jdbcType=INTEGER},
+            </if>
+            <if test="remarks != null">
+                #{remarks,jdbcType=VARCHAR},
+            </if>
+            <if test="deleted != null">
+                #{deleted,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="version != null">
+                #{version,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.bill99.ayf.auth.persistence.entity.Permission">
+        update t_ayf_permission
+        <set>
+            <if test="name != null">
+                `name` = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="pid != null">
+                pid = #{pid,jdbcType=BIGINT},
+            </if>
+            <if test="pids != null">
+                pids = #{pids,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                `type` = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="path != null">
+                `path` = #{path,jdbcType=VARCHAR},
+            </if>
+            <if test="permission != null">
+                permission = #{permission,jdbcType=VARCHAR},
+            </if>
+            <if test="treeNames != null">
+                tree_names = #{treeNames,jdbcType=VARCHAR},
+            </if>
+            <if test="sysCode != null">
+                sys_code = #{sysCode,jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                sort = #{sort,jdbcType=INTEGER},
+            </if>
+            <if test="remarks != null">
+                remarks = #{remarks,jdbcType=VARCHAR},
+            </if>
+            <if test="deleted != null">
+                deleted = #{deleted,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="version != null">
+                version = #{version,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.bill99.ayf.auth.persistence.entity.Permission">
+    update t_ayf_permission
+    set `name` = #{name,jdbcType=VARCHAR},
+      pid = #{pid,jdbcType=BIGINT},
+      pids = #{pids,jdbcType=VARCHAR},
+      `type` = #{type,jdbcType=INTEGER},
+      `path` = #{path,jdbcType=VARCHAR},
+      permission = #{permission,jdbcType=VARCHAR},
+      tree_names = #{treeNames,jdbcType=VARCHAR},
+      sys_code = #{sysCode,jdbcType=VARCHAR},
+      sort = #{sort,jdbcType=INTEGER},
+      remarks = #{remarks,jdbcType=VARCHAR},
+      deleted = #{deleted,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      version = #{version,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>
